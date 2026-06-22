@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sumeet Early Exit Request</title>
+    <title>Sumeet Early Exit & Leave Request</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- HTML वरून फोटो बनवून डाउनलोड करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -17,85 +16,30 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-        
-        body { 
-            background: var(--gradient-bg); 
-            color: var(--text-color); 
-            padding: 25px 15px; 
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container { 
-            max-width: 750px; 
-            width: 100%;
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-        }
-
-        .header-box { 
-            text-align: center; 
-            border-bottom: 2px dashed #1e3c72; 
-            margin-bottom: 20px; 
-            padding-bottom: 15px; 
-        }
-        
+        body { background: var(--gradient-bg); color: var(--text-color); padding: 25px 15px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 750px; width: 100%; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .header-box { text-align: center; border-bottom: 2px dashed #1e3c72; margin-bottom: 20px; padding-bottom: 15px; }
         .logo-box { margin-bottom: 10px; }
         .logo-box img { max-width: 130px; height: auto; border-radius: 8px; }
-
         .header-box h1 { color: #1e3c72; margin: 0; font-size: 22px; font-weight: 700; }
         .header-box p { color: #666; font-size: 14px; margin-top: 5px; }
-
         #status { text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 14px; padding: 8px; border-radius: 6px; }
-        
         .input-section { display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 600px) { .input-section { grid-template-columns: 1fr 1fr; } }
-        
         label { font-weight: 600; font-size: 13px; color: #34495e; }
-        input, select, textarea { 
-            width: 100%; padding: 11px; margin-top: 5px; border: 1px solid var(--border-color); 
-            border-radius: 8px; box-sizing: border-box; outline: none; background: #f8f9fa; transition: all 0.3s;
-        }
+        input, select, textarea { width: 100%; padding: 11px; margin-top: 5px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; outline: none; background: #f8f9fa; transition: all 0.3s; }
         input:focus, select:focus, textarea:focus { border-color: #1e3c72; background: #fff; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
-        
-        .notice-banner {
-            background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #b91c1c;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
+        .notice-banner { background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #b91c1c; font-size: 13px; font-weight: 600; }
+        .conditional-group { display: none; background: #f0fdf4; padding: 15px; border-radius: 10px; border-left: 4px solid #22c55e; margin-bottom: 15px; grid-column: 1 / -1; }
+        .photo-section-wrapper { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .photo-section-wrapper { grid-template-columns: 1fr 1fr; } }
         .file-wrapper { border: 2px dashed var(--border-color); padding: 12px; border-radius: 8px; text-align: center; background: #f8f9fa; position: relative; cursor: pointer; }
         .file-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 20px 0; color: #ef4444; }
         .checkbox-label input { width: 20px; height: 20px; accent-color: #ef4444; }
-
-        button { 
-            grid-column: 1 / -1; 
-            background: var(--btn-gradient); 
-            color: white; 
-            border: none; 
-            padding: 14px; 
-            cursor: pointer; 
-            font-size: 18px; 
-            font-weight: bold;
-            border-radius: 8px; 
-            margin-top: 15px; 
-            box-shadow: 0 4px 15px rgba(56,239,125,0.3);
-            transition: transform 0.2s;
-        }
-        button:active { transform: scale(0.98); }
+        button { grid-column: 1 / -1; background: var(--btn-gradient); color: white; border: none; padding: 14px; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 8px; margin-top: 15px; box-shadow: 0 4px 15px rgba(56,239,125,0.3); }
         
-        /* स्लिप डिझाईन (PNG स्वरूपात सेव्ह होणारा भाग) */
+        /* स्लिप डिझाईन */
         #notice-output { display: none; padding: 25px; line-height: 1.6; font-size: 16px; color: black; background: #fff; border: 2px solid #000; border-radius: 4px; }
         .letter-header { text-align: center; font-weight: bold; text-decoration: underline; font-size: 20px; margin-bottom: 20px; margin-top: 10px; }
         .sign-area { margin-top: 50px; display: flex; justify-content: space-between; font-weight: bold; }
@@ -105,21 +49,19 @@
 <body onload="initSheet()">
 
 <div class="container">
-    <!-- इनपुट फॉर्म -->
     <div id="input-form-wrapper">
         <div class="header-box">
             <div class="logo-box">
                 <img src="logo.png" alt="Sumeet Logo" onerror="this.src='https://via.placeholder.com/130x60?text=Sumeet+Logo'">
             </div>
             <h1>सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h1>
-            <p>Sumeet Early Exit Request</p>
+            <p>Sumeet Early Exit & Leave Request</p>
         </div>
 
         <div id="status" style="background: #e1f5fe; color: #0288d1;">डेटा कनेक्ट होत आहे, कृपया थांबा...</div>
 
-        <!-- महत्त्वाची सूचना -->
         <div class="notice-banner">
-            ⚠️ टीप: रजेसाठी (Full Leave) युनिट Officer ची स्वाक्षरी (Signature) असणे बंधनकारक आहे.
+            ⚠️ टीप: लांब कालावधीच्या रजेसाठी युनिट Officer ची स्वाक्षरी (Signature) असणे बंधनकारक आहे.
         </div>
 
         <form id="mainNoticeForm">
@@ -145,27 +87,54 @@
                     </select>
                 </div>
                 <div>
-                    <label>तारीख / Date:</label>
-                    <input type="date" id="event-date" required>
-                </div>
-                <div>
-                    <label>घरी जाण्याची वेळ / Out Time:</label>
-                    <input type="time" id="out-time" required>
+                    <label>अर्ज प्रकार / Request Type *</label>
+                    <select id="request-type" required onchange="toggleLeaveFields()">
+                        <option value="Half Day">Half Day (अर्धा दिवस)</option>
+                        <option value="Long Leave">लांब कालावधीची रजा</option>
+                    </select>
                 </div>
 
-                <!-- फोटो अपलोड ऑप्शन्स -->
-                <div>
-                    <label>WORKER HALF DAY PHOTO *</label>
-                    <div class="file-wrapper">
-                        <span id="lbl-p1">📷 कामगाराचा फोटो घ्या</span>
-                        <input type="file" id="worker-photo" accept="image/*" capture="environment" required onchange="updateFileLabel(this, 'lbl-p1')">
+                <!-- डायनॅमिक बदलणारा तारखेचा विभाग -->
+                <div id="date-conditional-box" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 15px;">
+                    <!-- डीफॉल्ट Half Day फील्ड्स -->
+                    <div id="hd-inputs" class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap:15px; width:100%;">
+                        <div>
+                            <label>तारीख / Date:</label>
+                            <input type="date" id="event-date">
+                        </div>
+                        <div>
+                            <label>घरी जाण्याची वेळ / Out Time:</label>
+                            <input type="time" id="out-time">
+                        </div>
+                    </div>
+                    <!-- Long Leave फील्ड्स -->
+                    <div id="ll-inputs" class="grid-2" style="display: none; grid-template-columns: 1fr 1fr; gap:15px; width:100%;">
+                        <div>
+                            <label>कधीपासून (From Date):</label>
+                            <input type="date" id="from-date">
+                        </div>
+                        <div>
+                            <label>कधीपर्यंत (To Date):</label>
+                            <input type="date" id="to-date">
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label>APPLICATION PHOTO (अर्ज फोटो) *</label>
-                    <div class="file-wrapper">
-                        <span id="lbl-p2">📄 अर्जाचा फोटो घ्या</span>
-                        <input type="file" id="app-photo" accept="image/*" required onchange="updateFileLabel(this, 'lbl-p2')">
+
+                <!-- फोटो अपलोड विभाग (Dynamic) -->
+                <div class="photo-section-wrapper">
+                    <div id="worker-photo-box">
+                        <label>WORKER HALF DAY PHOTO *</label>
+                        <div class="file-wrapper">
+                            <span id="lbl-p1">📷 कामगाराचा फोटो घ्या</span>
+                            <input type="file" id="worker-photo" accept="image/*" capture="environment" onchange="updateFileLabel(this, 'lbl-p1')">
+                        </div>
+                    </div>
+                    <div id="app-photo-box">
+                        <label>APPLICATION PHOTO (अर्ज फोटो) *</label>
+                        <div class="file-wrapper">
+                            <span id="lbl-p2">📄 अर्जाचा फोटो घ्या</span>
+                            <input type="file" id="app-photo" accept="image/*" onchange="updateFileLabel(this, 'lbl-p2')">
+                        </div>
                     </div>
                 </div>
 
@@ -175,8 +144,8 @@
                 </div>
 
                 <div style="grid-column: 1 / -1;">
-                    <label>कारण / Reason for Early Exit:</label>
-                    <textarea id="manual-reason" rows="2" placeholder="येथे बाहेर जाण्याचे किंवा रजेचे कारण लिहा..." required></textarea>
+                    <label>कारण / Reason:</label>
+                    <textarea id="manual-reason" rows="2" placeholder="येथे सविस्तर कारण लिहा..." required></textarea>
                 </div>
 
                 <div style="grid-column: 1 / -1;">
@@ -191,23 +160,21 @@
         </form>
     </div>
 
-    <!-- स्लिप आउटपुट (हा भाग PNG स्वरूपात डाउनलोड व शीटवर सेव्ह होईल) -->
+    <!-- स्लिप आउटपुट -->
     <div id="notice-output">
         <center>
-            <img src="logo.png" style="max-width:100px; display:block; margin-bottom:5px;" onerror="this.style.display='none'">
-            <h2 style="margin: 0; font-size:20px;">सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h2>
+            <h2 style="margin: 0; font-size:18px;">सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h2>
         </center>
         <hr style="margin:10px 0; border:1px solid #000;">
-        <div class="letter-header">Early Exit Request Slip</div>
-        <div style="float: right;">दिनांक: <span id="pr-date"></span></div><br>
-        <strong>प्रती :</strong> <span id="pr-name"></span><br>
-        <strong>हुद्दा :</strong> <span id="pr-desig"></span><br>
+        <div class="letter-header" id="pr-title">Early Exit Request Slip</div>
+        <strong>कर्मचारी नाव :</strong> <span id="pr-name"></span><br>
+        <strong>पद / Designation :</strong> <span id="pr-desig"></span><br>
         <strong>तिकीट नंबर (EMP CODE) :</strong> <span id="pr-id"></span><br>
         <strong>शिफ्ट / Shift :</strong> <span id="pr-shift"></span><br>
-        <strong>बाहेर जाण्याची वेळ / Out Time :</strong> <span id="pr-time"></span><br>
+        <div id="pr-date-range" style="font-weight: bold; margin-top: 5px; color: #1e3c72;"></div>
         
         <p style="margin-top:15px;">
-            <strong>निर्गमन कारण (Reason):</strong> <br>
+            <strong>कारण / Reason:</strong> <br>
             <span id="pr-manual" style="padding-left: 15px; font-weight: bold; display:block; color:#2c3e50;"></span>
         </p>
         
@@ -219,23 +186,19 @@
             <span>यूनिट ऑफिसर</span>
             <span>मानव संसाधन (HR)</span>
         </div>
-        <div class="note-section">
-            <strong>नोट :</strong> सदर मंजुरी अर्ज स्लिप व्हॉटसअॅपवर पाठवावी आणि कामावर हजर झाल्यावर सही घेऊन HR कडे जमा करावी.
-        </div>
     </div>
 </div>
 
 <script>
-    // 🛑 येथे तुमची Apps Script Web App URL टाका 🛑
-    const WEB_APP_URL = "https://script.google.com/macros/s/XXXXXX/exec"; 
-
-    // तुमची गुगल शीटची प्रकटीकरण (Published) CSV लिंक
-    const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeyEu_N_mJ9UStKc6sXa2jdpMOr6QxviTldIucayGD1fg-ShCDDCdlKcOFcmKPtBt8LJpcWRLLnsSF/pub?output=csv"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzZERHy-Hl39Ve9h9U28u_e4ky4qh2dN6n3Zu_RWN_se8G-_Ba4lSKGeBJrA7KPyGUqZw/exec"; 
+    const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzA6vn-L86DuO3nPeT3YRrsX-luF2qsplMz2DvSOhrumyI_j7tYF6opy-9r9yOIKN2lvx7rABNPv_L/pub?output=csv"; 
 
     let masterData = [];
     
-    // आजची डीफॉल्ट तारीख सेट करणे
+    // डीफॉल्ट तारखा
     document.getElementById('event-date').value = new Date().toISOString().substring(0, 10);
+    document.getElementById('from-date').value = new Date().toISOString().substring(0, 10);
+    document.getElementById('to-date').value = new Date().toISOString().substring(0, 10);
 
     function initSheet() {
         Papa.parse(sheetCSV, {
@@ -244,24 +207,43 @@
             skipEmptyLines: true,
             complete: function(results) {
                 masterData = results.data;
-                const status = document.getElementById('status');
-                status.innerText = "डेटा यशस्वीरित्या कनेक्ट झाला! ✅";
-                status.style.background = "#e6f4ea";
-                status.style.color = "#137333";
-            },
-            error: function() {
-                const status = document.getElementById('status');
-                status.innerText = "डेटा कनेक्ट झाला नाही. CSV लिंक किंवा इंटरनेट तपासा.";
-                status.style.background = "#fce8e6";
-                status.style.color = "#c5221f";
+                document.getElementById('status').innerText = "डेटा यशस्वीरित्या कनेक्ट झाला! ✅";
+                document.getElementById('status').style.background = "#e6f4ea";
+                document.getElementById('status').style.color = "#137333";
+                toggleLeaveFields(); // इनिशिअल फोटो रिक्वायर्ड अटी लागू करण्यासाठी
             }
         });
     }
 
-    // आयडी फेच करण्यासाठीचे मूळ परफेक्ट वर्किंग लॉजिक
+    function toggleLeaveFields() {
+        const type = document.getElementById('request-type').value;
+        const hdInputs = document.getElementById('hd-inputs');
+        const llInputs = document.getElementById('ll-inputs');
+        const workerPhotoBox = document.getElementById('worker-photo-box');
+        
+        const workerPhoto = document.getElementById('worker-photo');
+        const appPhoto = document.getElementById('app-photo');
+
+        if(type === 'Half Day') {
+            hdInputs.style.display = 'grid';
+            llInputs.style.display = 'none';
+            workerPhotoBox.style.display = 'block';
+            
+            workerPhoto.required = true;
+            appPhoto.required = true;
+        } else {
+            hdInputs.style.display = 'none';
+            llInputs.style.display = 'grid';
+            workerPhotoBox.style.display = 'none';
+            
+            workerPhoto.required = false;
+            appPhoto.required = true; // लांब रजेसाठी फक्त अर्जाचा फोटो बंधनकारक
+        }
+    }
+
     function findEmployee() {
         const id = document.getElementById('emp-id').value.trim().toUpperCase();
-        if(!id) { resetFields(); return; }
+        if(!id) { document.getElementById('emp-name').value = ""; document.getElementById('emp-desig').value = ""; return; }
 
         const emp = masterData.find(row => {
             const rowId = (row['EMP CODE'] || row['emp code'] || row['Emp Code'] || "").toString().trim().toUpperCase();
@@ -269,17 +251,11 @@
         });
 
         if(emp) {
-            document.getElementById('emp-name').value = emp['FULL NAME'] || emp['full name'] || emp['Full Name'] || "";
-            document.getElementById('emp-desig').value = emp['DESIGNATION'] || emp['designation'] || emp['Designation'] || "";
+            document.getElementById('emp-name').value = emp['FULL NAME'] || emp['full name'] || "";
+            document.getElementById('emp-desig').value = emp['DESIGNATION'] || emp['designation'] || "";
         } else {
             document.getElementById('emp-name').value = "शोधत आहे/सापडला नाही...";
-            document.getElementById('emp-desig').value = "";
         }
-    }
-
-    function resetFields() {
-        document.getElementById('emp-name').value = "";
-        document.getElementById('emp-desig').value = "";
     }
 
     function updateFileLabel(input, labelId) {
@@ -290,99 +266,82 @@
     }
 
     function getBase64(file) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (!file) resolve("");
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
         });
     }
 
-    // फॉर्म सबमिट + PNG डाउनलोड + Google Sheet अपलोड प्रक्रिया
     document.getElementById('mainNoticeForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-
         const name = document.getElementById('emp-name').value;
-        if(!name || name.includes("सापडला नाही")) { 
-            alert("कृपया वैध तिकीट नंबर (EMP CODE) टाका."); 
-            return; 
-        }
+        if(!name || name.includes("सापडला नाही")) { alert("कृपया वैध तिकीट नंबर टाका."); return; }
 
-        // स्लिपमध्ये डेटा भरणे
-        document.getElementById('pr-date').innerText = document.getElementById('event-date').value;
+        const type = document.getElementById('request-type').value;
+        
+        // स्लिप भरणे
         document.getElementById('pr-name').innerText = name;
         document.getElementById('pr-desig').innerText = document.getElementById('emp-desig').value;
         document.getElementById('pr-id').innerText = document.getElementById('emp-id').value;
         document.getElementById('pr-shift').innerText = document.getElementById('shift-val').value;
-        document.getElementById('pr-time').innerText = document.getElementById('out-time').value;
         document.getElementById('pr-supervisor').innerText = document.getElementById('supervisor-name').value;
-        
-        const man = document.getElementById('manual-reason').value.trim();
-        document.getElementById('pr-manual').innerText = man;
+        document.getElementById('pr-manual').innerText = document.getElementById('manual-reason').value;
 
-        // --- पीएनजी स्लिप जनरेशन ---
+        if(type === 'Half Day') {
+            document.getElementById('pr-title').innerText = "Half Day Request Slip";
+            document.getElementById('pr-date-range').innerText = `तारीख: ${document.getElementById('event-date').value} | वेळ: ${document.getElementById('out-time').value}`;
+        } else {
+            document.getElementById('pr-title').innerText = "लांब कालावधीची रजा Slip";
+            document.getElementById('pr-date-range').innerText = `कालावधी: ${document.getElementById('from-date').value} ते ${document.getElementById('to-date').value}`;
+        }
+
         const inputForm = document.getElementById('input-form-wrapper');
         const outputSlip = document.getElementById('notice-output');
-
         inputForm.style.display = 'none'; 
         outputSlip.style.display = 'block'; 
 
         html2canvas(outputSlip, { useCORS: true, allowTaint: true, scale: 2 }).then(async (canvas) => {
             const slipBase64Data = canvas.toDataURL('image/png');
             
-            // स्लिप ऑटो-डाउनलोड
             const link = document.createElement('a');
-            link.download = `Sumeet_EarlyExit_${document.getElementById('emp-id').value}.png`;
+            link.download = `${type}_Slip_${document.getElementById('emp-id').value}.png`;
             link.href = slipBase64Data;
             link.click();
 
-            // इमेजेस बेस६४ मध्ये कन्व्हर्ट करणे (गुगल शीटसाठी)
-            const file1 = document.getElementById('worker-photo').files[0];
-            const file2 = document.getElementById('app-photo').files[0];
+            const workerPhotoFile = document.getElementById('worker-photo').files[0];
+            const appPhotoFile = document.getElementById('app-photo').files[0];
 
-            const workerImgBase64 = await getBase64(file1);
-            const appImgBase64 = await getBase64(file2);
-            const slipImgBase64 = slipBase64Data.split(',')[1];
+            const workerImgBase64 = await getBase64(workerPhotoFile);
+            const appImgBase64 = await getBase64(appPhotoFile);
 
-            // पेलोड ऑब्जेक्ट तयार करणे
             const payload = {
                 employeeId: document.getElementById('emp-id').value,
                 employeeName: name,
                 designation: document.getElementById('emp-desig').value,
                 shift: document.getElementById('shift-val').value,
-                eventDate: document.getElementById('event-date').value,
-                outTime: document.getElementById('out-time').value,
+                requestType: type,
+                date1: type === 'Half Day' ? document.getElementById('event-date').value : document.getElementById('from-date').value,
+                date2: type === 'Half Day' ? document.getElementById('out-time').value : document.getElementById('to-date').value,
                 supervisor: document.getElementById('supervisor-name').value,
-                reason: man,
+                reason: document.getElementById('manual-reason').value,
                 workerPhoto: workerImgBase64,
                 appPhoto: appImgBase64,
-                slipPhoto: slipImgBase64
+                slipPhoto: slipBase64Data.split(',')[1]
             };
 
-            document.getElementById('status').innerText = "डेटा व ३ फोटो गुगल शीटवर सेव्ह होत आहेत...";
-            document.getElementById('status').style.background = "#fff3cd";
-
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.text())
-            .then(resData => {
-                alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली आहे!');
-                // फॉर्म ऑटो रिफ्रेश करणे
+            document.getElementById('status').innerText = "डेटा गुगल शीटवर अपलोड होत आहे...";
+            
+            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(() => {
+                alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली!');
                 document.getElementById('mainNoticeForm').reset();
                 document.getElementById('lbl-p1').innerText = "📷 कामगाराचा फोटो घ्या";
                 document.getElementById('lbl-p2').innerText = "📄 अर्जाचा फोटो घ्या";
                 inputForm.style.display = 'block';
                 outputSlip.style.display = 'none';
                 initSheet();
-            })
-            .catch(err => {
-                console.error(err);
-                alert('डेटा अपलोड करताना एरर आला, पण स्लिप डाउनलोड झाली आहे.');
-                inputForm.style.display = 'block';
-                outputSlip.style.display = 'none';
             });
         });
     });
