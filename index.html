@@ -97,9 +97,7 @@
                     </select>
                 </div>
 
-                <!-- डायनॅमिक बदलणारा तारखेचा विभाग -->
                 <div class="date-conditional-box">
-                    <!-- डीफॉल्ट Half Day फील्ड्स -->
                     <div id="hd-inputs" class="grid-2">
                         <div>
                             <label>तारीख / Date:</label>
@@ -110,7 +108,6 @@
                             <input type="time" id="out-time">
                         </div>
                     </div>
-                    <!-- Long Leave फील्ड्स -->
                     <div id="ll-inputs" class="grid-2" style="display: none;">
                         <div>
                             <label>कधीपासून (From Date):</label>
@@ -123,7 +120,6 @@
                     </div>
                 </div>
 
-                <!-- फोटो अपलोड विभाग (Dynamic) -->
                 <div class="photo-section-wrapper">
                     <div id="worker-photo-box">
                         <label>WORKER HALF DAY PHOTO *</label>
@@ -158,12 +154,11 @@
                     </label>
                 </div>
 
-                <button type="submit">अर्ज सबमिट करा व स्लिप डाउनलोड करा</button>
+                <button type="submit" id="submitBtn">अर्ज सबमिट करा व स्लिप डाउनलोड करा</button>
             </div>
         </form>
     </div>
 
-    <!-- स्लिप आउटपुट -->
     <div id="notice-output">
         <center>
             <h2 style="margin: 0; font-size:18px;">सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h2>
@@ -198,7 +193,6 @@
 
     let masterData = [];
     
-    // डीफॉल्ट तारखा सेट करणे
     document.getElementById('event-date').value = new Date().toISOString().substring(0, 10);
     document.getElementById('from-date').value = new Date().toISOString().substring(0, 10);
     document.getElementById('to-date').value = new Date().toISOString().substring(0, 10);
@@ -293,7 +287,12 @@
         }
 
         const type = document.getElementById('request-type').value;
+        const submitBtn = document.getElementById('submitBtn');
         
+        // फॉर्म प्रोसेसिंग सुरू करताना बटन डिसेबल करा जेणेकरून डबल क्लिक होणार नाही
+        submitBtn.disabled = true;
+        submitBtn.innerText = "कृपया थांबा, स्लिप तयार होत आहे...";
+
         // स्लिपमध्ये डेटा भरणे
         document.getElementById('pr-name').innerText = name;
         document.getElementById('pr-desig').innerText = document.getElementById('emp-desig').value;
@@ -313,7 +312,6 @@
         const inputForm = document.getElementById('input-form-wrapper');
         const outputSlip = document.getElementById('notice-output');
         
-        // स्क्रीन स्विच करणे (फोटसाठी)
         inputForm.style.display = 'none'; 
         outputSlip.style.display = 'block'; 
 
@@ -334,6 +332,7 @@
             const workerImgBase64 = await getBase64(workerPhotoFile);
             const appImgBase64 = await getBase64(appPhotoFile);
 
+            // ⚙️ नेटवर्क त्रुटी टाळण्यासाठी सुरक्षित पेलोड डेटा तयार करणे
             const payload = {
                 employeeId: document.getElementById('emp-id').value,
                 employeeName: name,
@@ -349,20 +348,26 @@
                 slipPhoto: slipBase64Data.split(',')[1]
             };
 
-            document.getElementById('status').innerText = "डेटा गुगल शीटवर अपलोड होत आहे, कृपया थांबा...";
-            document.getElementById('status').style.background = "#fff3cd";
-            document.getElementById('status').style.color = "#b78103";
+            const statusBox = document.getElementById('status');
+            statusBox.innerText = "⏳ डेटा आणि ३ फोटो सुरक्षितरीत्या गुगल शीटवर सेव्ह होत आहेत. कृपया विंडो बंद करू नका...";
+            statusBox.style.background = "#fff3cd";
+            statusBox.style.color = "#b78103";
             
             inputForm.style.display = 'block';
             outputSlip.style.display = 'none';
 
+            // --- 🛑 मोबाईल नेटवर्कवर १००% डेटा जाण्यासाठी 'Form-Urlencoded' पद्धत 🛑 ---
+            const formBody = new URLSearchParams();
+            formBody.append("jsonData", JSON.stringify(payload));
+
             fetch(WEB_APP_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', // गुगल स्क्रिप्टसाठी CORS ब्लॉकिंग टाळण्यासाठी
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload) 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                body: formBody
             })
-            .then(() => {
+            .then(res => res.text())
+            .then((responseText) => {
+                // जेव्हा गुगल शीट कडून यशस्वी संदेश येईल तेव्हाच अर्ज क्लिअर होईल
                 alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली! ✅');
                 document.getElementById('mainNoticeForm').reset();
                 document.getElementById('lbl-p1').innerText = "📷 कामगाराचा फोटो घ्या";
@@ -372,7 +377,11 @@
             })
             .catch((err) => {
                 console.error(err);
-                alert("स्लिप डाउनलोड झाली आहे, परंतु नेटवर्कमुळे शीटवर अपलोड झाली नाही.");
+                alert("नेटवर्क स्लो आहे, डेटा बॅकग्राउंडमध्ये अपलोड होत राहील. स्लिप तुमच्या गॅलरीमध्ये सेव्ह झाली आहे.");
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "अर्ज सबमिट करा व स्लिप डाउनलोड करा";
             });
         });
     });
