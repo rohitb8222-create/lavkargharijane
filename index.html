@@ -30,7 +30,10 @@
         input, select, textarea { width: 100%; padding: 11px; margin-top: 5px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; outline: none; background: #f8f9fa; transition: all 0.3s; }
         input:focus, select:focus, textarea:focus { border-color: #1e3c72; background: #fff; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
         .notice-banner { background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #b91c1c; font-size: 13px; font-weight: 600; }
-        .conditional-group { display: none; background: #f0fdf4; padding: 15px; border-radius: 10px; border-left: 4px solid #22c55e; margin-bottom: 15px; grid-column: 1 / -1; }
+        
+        .date-conditional-box { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        
         .photo-section-wrapper { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 600px) { .photo-section-wrapper { grid-template-columns: 1fr 1fr; } }
         .file-wrapper { border: 2px dashed var(--border-color); padding: 12px; border-radius: 8px; text-align: center; background: #f8f9fa; position: relative; cursor: pointer; }
@@ -58,7 +61,7 @@
             <p>Sumeet Early Exit & Leave Request</p>
         </div>
 
-        <div id="status" style="background: #e1f5fe; color: #0288d1;">डेटा कनेक्ट होत आहे, कृपया थांबा...</div>
+        <div id="status" style="background: #e1f5fe; color: #0288d1; padding: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; border-radius: 6px;">डेटा कनेक्ट होत आहे, कृपया थांबा...</div>
 
         <div class="notice-banner">
             ⚠️ टीप: लांब कालावधीच्या रजेसाठी युनिट Officer ची स्वाक्षरी (Signature) असणे बंधनकारक आहे.
@@ -95,9 +98,9 @@
                 </div>
 
                 <!-- डायनॅमिक बदलणारा तारखेचा विभाग -->
-                <div id="date-conditional-box" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr; gap: 15px;">
+                <div class="date-conditional-box">
                     <!-- डीफॉल्ट Half Day फील्ड्स -->
-                    <div id="hd-inputs" class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap:15px; width:100%;">
+                    <div id="hd-inputs" class="grid-2">
                         <div>
                             <label>तारीख / Date:</label>
                             <input type="date" id="event-date">
@@ -108,7 +111,7 @@
                         </div>
                     </div>
                     <!-- Long Leave फील्ड्स -->
-                    <div id="ll-inputs" class="grid-2" style="display: none; grid-template-columns: 1fr 1fr; gap:15px; width:100%;">
+                    <div id="ll-inputs" class="grid-2" style="display: none;">
                         <div>
                             <label>कधीपासून (From Date):</label>
                             <input type="date" id="from-date">
@@ -195,7 +198,7 @@
 
     let masterData = [];
     
-    // डीफॉल्ट तारखा
+    // डीफॉल्ट तारखा सेट करणे
     document.getElementById('event-date').value = new Date().toISOString().substring(0, 10);
     document.getElementById('from-date').value = new Date().toISOString().substring(0, 10);
     document.getElementById('to-date').value = new Date().toISOString().substring(0, 10);
@@ -210,7 +213,12 @@
                 document.getElementById('status').innerText = "डेटा यशस्वीरित्या कनेक्ट झाला! ✅";
                 document.getElementById('status').style.background = "#e6f4ea";
                 document.getElementById('status').style.color = "#137333";
-                toggleLeaveFields(); // इनिशिअल फोटो रिक्वायर्ड अटी लागू करण्यासाठी
+                toggleLeaveFields(); 
+            },
+            error: function() {
+                document.getElementById('status').innerText = "डेटा कनेक्ट झाला नाही. लिंक तपासा. ❌";
+                document.getElementById('status').style.background = "#fce8e6";
+                document.getElementById('status').style.color = "#c5221f";
             }
         });
     }
@@ -237,7 +245,7 @@
             workerPhotoBox.style.display = 'none';
             
             workerPhoto.required = false;
-            appPhoto.required = true; // लांब रजेसाठी फक्त अर्जाचा फोटो बंधनकारक
+            appPhoto.required = true; 
         }
     }
 
@@ -255,6 +263,7 @@
             document.getElementById('emp-desig').value = emp['DESIGNATION'] || emp['designation'] || "";
         } else {
             document.getElementById('emp-name').value = "शोधत आहे/सापडला नाही...";
+            document.getElementById('emp-desig').value = "";
         }
     }
 
@@ -267,21 +276,25 @@
 
     function getBase64(file) {
         return new Promise((resolve) => {
-            if (!file) resolve("");
+            if (!file) { resolve(""); return; }
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = () => resolve("");
         });
     }
 
     document.getElementById('mainNoticeForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const name = document.getElementById('emp-name').value;
-        if(!name || name.includes("सापडला नाही")) { alert("कृपया वैध तिकीट नंबर टाका."); return; }
+        if(!name || name.includes("शोधत आहे") || name.includes("सापडला नाही")) { 
+            alert("कृपया वैध तिकीट नंबर टाका."); 
+            return; 
+        }
 
         const type = document.getElementById('request-type').value;
         
-        // स्लिप भरणे
+        // स्लिपमध्ये डेटा भरणे
         document.getElementById('pr-name').innerText = name;
         document.getElementById('pr-desig').innerText = document.getElementById('emp-desig').value;
         document.getElementById('pr-id').innerText = document.getElementById('emp-id').value;
@@ -299,17 +312,22 @@
 
         const inputForm = document.getElementById('input-form-wrapper');
         const outputSlip = document.getElementById('notice-output');
+        
+        // स्क्रीन स्विच करणे (फोटसाठी)
         inputForm.style.display = 'none'; 
         outputSlip.style.display = 'block'; 
 
+        // html2canvas कनवर्टर
         html2canvas(outputSlip, { useCORS: true, allowTaint: true, scale: 2 }).then(async (canvas) => {
             const slipBase64Data = canvas.toDataURL('image/png');
             
+            // इमेज ऑटो डाउनलोड
             const link = document.createElement('a');
             link.download = `${type}_Slip_${document.getElementById('emp-id').value}.png`;
             link.href = slipBase64Data;
             link.click();
 
+            // इमेजेस बेस६४ जनरेशन
             const workerPhotoFile = document.getElementById('worker-photo').files[0];
             const appPhotoFile = document.getElementById('app-photo').files[0];
 
@@ -331,17 +349,30 @@
                 slipPhoto: slipBase64Data.split(',')[1]
             };
 
-            document.getElementById('status').innerText = "डेटा गुगल शीटवर अपलोड होत आहे...";
+            document.getElementById('status').innerText = "डेटा गुगल शीटवर अपलोड होत आहे, कृपया थांबा...";
+            document.getElementById('status').style.background = "#fff3cd";
+            document.getElementById('status').style.color = "#b78103";
             
-            fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) })
+            inputForm.style.display = 'block';
+            outputSlip.style.display = 'none';
+
+            fetch(WEB_APP_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', // गुगल स्क्रिप्टसाठी CORS ब्लॉकिंग टाळण्यासाठी
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload) 
+            })
             .then(() => {
-                alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली!');
+                alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली! ✅');
                 document.getElementById('mainNoticeForm').reset();
                 document.getElementById('lbl-p1').innerText = "📷 कामगाराचा फोटो घ्या";
                 document.getElementById('lbl-p2').innerText = "📄 अर्जाचा फोटो घ्या";
-                inputForm.style.display = 'block';
-                outputSlip.style.display = 'none';
+                toggleLeaveFields();
                 initSheet();
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("स्लिप डाउनलोड झाली आहे, परंतु नेटवर्कमुळे शीटवर अपलोड झाली नाही.");
             });
         });
     });
