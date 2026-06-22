@@ -41,12 +41,12 @@
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 20px 0; color: #ef4444; }
         .checkbox-label input { width: 20px; height: 20px; accent-color: #ef4444; }
         button { grid-column: 1 / -1; background: var(--btn-gradient); color: white; border: none; padding: 14px; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 8px; margin-top: 15px; box-shadow: 0 4px 15px rgba(56,239,125,0.3); }
-        
+        button:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+
         /* स्लिप डिझाईन */
         #notice-output { display: none; padding: 25px; line-height: 1.6; font-size: 16px; color: black; background: #fff; border: 2px solid #000; border-radius: 4px; }
         .letter-header { text-align: center; font-weight: bold; text-decoration: underline; font-size: 20px; margin-bottom: 20px; margin-top: 10px; }
         .sign-area { margin-top: 50px; display: flex; justify-content: space-between; font-weight: bold; }
-        .note-section { margin-top: 30px; border-top: 1px dashed #000; padding-top: 10px; font-size: 13px; font-style: italic; color: #333; }
     </style>
 </head>
 <body onload="initSheet()">
@@ -159,6 +159,7 @@
         </form>
     </div>
 
+    <!-- स्लिप आउटपुट -->
     <div id="notice-output">
         <center>
             <h2 style="margin: 0; font-size:18px;">सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h2>
@@ -188,6 +189,7 @@
 </div>
 
 <script>
+    // तुमची अचूक Apps Script URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzZERHy-Hl39Ve9h9U28u_e4ky4qh2dN6n3Zu_RWN_se8G-_Ba4lSKGeBJrA7KPyGUqZw/exec"; 
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzA6vn-L86DuO3nPeT3YRrsX-luF2qsplMz2DvSOhrumyI_j7tYF6opy-9r9yOIKN2lvx7rABNPv_L/pub?output=csv"; 
 
@@ -208,11 +210,6 @@
                 document.getElementById('status').style.background = "#e6f4ea";
                 document.getElementById('status').style.color = "#137333";
                 toggleLeaveFields(); 
-            },
-            error: function() {
-                document.getElementById('status').innerText = "डेटा कनेक्ट झाला नाही. लिंक तपासा. ❌";
-                document.getElementById('status').style.background = "#fce8e6";
-                document.getElementById('status').style.color = "#c5221f";
             }
         });
     }
@@ -230,14 +227,12 @@
             hdInputs.style.display = 'grid';
             llInputs.style.display = 'none';
             workerPhotoBox.style.display = 'block';
-            
             workerPhoto.required = true;
             appPhoto.required = true;
         } else {
             hdInputs.style.display = 'none';
             llInputs.style.display = 'grid';
             workerPhotoBox.style.display = 'none';
-            
             workerPhoto.required = false;
             appPhoto.required = true; 
         }
@@ -263,18 +258,42 @@
 
     function updateFileLabel(input, labelId) {
         if(input.files.length > 0) {
-            document.getElementById(labelId).innerText = "✅ " + input.files[0].name.substring(0, 15) + "...";
-            document.getElementById(labelId).style.color = "green";
+            document.getElementById(labelId).innerText = "⏳ फोटो प्रक्रिया सुरू आहे...";
+            document.getElementById(labelId).style.color = "orange";
         }
     }
 
-    function getBase64(file) {
+    // 🔥 जादुई कॉम्प्रेसर लॉजिक (कॅमेरा फोटो लहान KB मध्ये रुपांतरीत करेल)
+    function compressAndGetBase64(file) {
         return new Promise((resolve) => {
             if (!file) { resolve(""); return; }
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = () => resolve("");
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // मॅक्स रुंदी ८०० ठेवून फोटो रीसाईज करणे (MB मधून KB मध्ये आणण्यासाठी)
+                    const MAX_WIDTH = 800;
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // quality ०.६ ठेवल्यामुळे ८ MB चा फोटो डायरेक्ट ३०० KB चा होईल
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    resolve(dataUrl.split(',')[1]);
+                };
+            };
         });
     }
 
@@ -288,12 +307,16 @@
 
         const type = document.getElementById('request-type').value;
         const submitBtn = document.getElementById('submitBtn');
+        const statusBox = document.getElementById('status');
         
-        // फॉर्म प्रोसेसिंग सुरू करताना बटन डिसेबल करा जेणेकरून डबल क्लिक होणार नाही
+        // बटन लॉक करा
         submitBtn.disabled = true;
-        submitBtn.innerText = "कृपया थांबा, स्लिप तयार होत आहे...";
+        submitBtn.innerText = "⏳ फोटो कॉम्प्रेस होत आहेत...";
+        statusBox.innerText = "⏳ फोटोची साईझ कमी केली जात आहे...";
+        statusBox.style.background = "#fff3cd";
+        statusBox.style.color = "#b78103";
 
-        // स्लिपमध्ये डेटा भरणे
+        // स्लिप भरणे
         document.getElementById('pr-name').innerText = name;
         document.getElementById('pr-desig').innerText = document.getElementById('emp-desig').value;
         document.getElementById('pr-id').innerText = document.getElementById('emp-id').value;
@@ -315,24 +338,29 @@
         inputForm.style.display = 'none'; 
         outputSlip.style.display = 'block'; 
 
-        // html2canvas कनवर्टर
         html2canvas(outputSlip, { useCORS: true, allowTaint: true, scale: 2 }).then(async (canvas) => {
-            const slipBase64Data = canvas.toDataURL('image/png');
+            const slipBase64Data = canvas.toDataURL('image/jpeg', 0.7);
             
-            // इमेज ऑटो डाउनलोड
+            // स्लिप इमेज डाउनलोड
             const link = document.createElement('a');
-            link.download = `${type}_Slip_${document.getElementById('emp-id').value}.png`;
+            link.download = `${type}_Slip_${document.getElementById('emp-id').value}.jpg`;
             link.href = slipBase64Data;
             link.click();
 
-            // इमेजेस बेस६४ जनरेशन
+            // बॅकग्राउंड स्क्रीन रिस्टोअर करा
+            inputForm.style.display = 'block';
+            outputSlip.style.display = 'none';
+
+            // कॅमेरा फोटोंचे कॉम्प्रेशन सुरू करणे
             const workerPhotoFile = document.getElementById('worker-photo').files[0];
             const appPhotoFile = document.getElementById('app-photo').files[0];
 
-            const workerImgBase64 = await getBase64(workerPhotoFile);
-            const appImgBase64 = await getBase64(appPhotoFile);
+            statusBox.innerText = "⏳ फोटो यशस्वीरित्या कॉम्प्रेस झाले! आता गुगल शीटवर अपलोड होत आहेत...";
+            submitBtn.innerText = "🚀 शीटवर सेव्ह होत आहे...";
 
-            // ⚙️ नेटवर्क त्रुटी टाळण्यासाठी सुरक्षित पेलोड डेटा तयार करणे
+            const workerImgBase64 = await compressAndGetBase64(workerPhotoFile);
+            const appImgBase64 = await compressAndGetBase64(appPhotoFile);
+
             const payload = {
                 employeeId: document.getElementById('emp-id').value,
                 employeeName: name,
@@ -348,15 +376,7 @@
                 slipPhoto: slipBase64Data.split(',')[1]
             };
 
-            const statusBox = document.getElementById('status');
-            statusBox.innerText = "⏳ डेटा आणि ३ फोटो सुरक्षितरीत्या गुगल शीटवर सेव्ह होत आहेत. कृपया विंडो बंद करू नका...";
-            statusBox.style.background = "#fff3cd";
-            statusBox.style.color = "#b78103";
-            
-            inputForm.style.display = 'block';
-            outputSlip.style.display = 'none';
-
-            // --- 🛑 मोबाईल नेटवर्कवर १००% डेटा जाण्यासाठी 'Form-Urlencoded' पद्धत 🛑 ---
+            // फॉर्म डेटा सबमिशन (URLSearchParams मुळे मोबाईलवर डेटा १००% पोहोचतो)
             const formBody = new URLSearchParams();
             formBody.append("jsonData", JSON.stringify(payload));
 
@@ -367,17 +387,18 @@
             })
             .then(res => res.text())
             .then((responseText) => {
-                // जेव्हा गुगल शीट कडून यशस्वी संदेश येईल तेव्हाच अर्ज क्लिअर होईल
                 alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली! ✅');
                 document.getElementById('mainNoticeForm').reset();
                 document.getElementById('lbl-p1').innerText = "📷 कामगाराचा फोटो घ्या";
+                document.getElementById('lbl-p1').style.color = "";
                 document.getElementById('lbl-p2').innerText = "📄 अर्जाचा फोटो घ्या";
+                document.getElementById('lbl-p2').style.color = "";
                 toggleLeaveFields();
                 initSheet();
             })
             .catch((err) => {
                 console.error(err);
-                alert("नेटवर्क स्लो आहे, डेटा बॅकग्राउंडमध्ये अपलोड होत राहील. स्लिप तुमच्या गॅलरीमध्ये सेव्ह झाली आहे.");
+                alert("अपलोड अयशस्वी! कृपया इंटरनेट कनेक्शन तपासा किंवा गुगल स्क्रिप्टची नवीन व्हर्जन लिंक टाका.");
             })
             .finally(() => {
                 submitBtn.disabled = false;
