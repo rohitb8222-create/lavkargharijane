@@ -4,37 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sumeet Early Exit Request</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- HTML वरून फोटो बनवण्यासाठी लायब्ररी -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- HTML वरून फोटो बनवून डाउनलोड करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #f3f4f6;
-            --card: #ffffff;
-            --text: #1f2937;
-            --border: #d1d5db;
+            --gradient-bg: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --btn-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #dcdde1;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
         
-        .form-container { 
-            background: var(--card); padding: 30px; border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 700px; 
+        body { 
+            background: var(--gradient-bg); 
+            color: var(--text-color); 
+            padding: 25px 15px; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .pass-card { padding: 10px; background: #fff; border-radius: 12px; }
+        .container { 
+            max-width: 750px; 
+            width: 100%;
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
 
-        .logo-container { text-align: center; margin-bottom: 15px; }
-        .logo-container img { max-width: 120px; height: auto; border-radius: 8px; }
+        .header-box { 
+            text-align: center; 
+            border-bottom: 2px dashed #1e3c72; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px; 
+        }
         
-        .form-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; }
-        .form-header h2 { color: var(--primary); font-size: 24px; font-weight: 700; }
-        .form-header p { color: #6b7280; font-size: 14px; margin-top: 5px; }
+        .logo-box { margin-bottom: 10px; }
+        .logo-box img { max-width: 130px; height: auto; border-radius: 8px; }
 
-        /* सूचना / Note Banner */
+        .header-box h1 { color: #1e3c72; margin: 0; font-size: 22px; font-weight: 700; }
+        .header-box p { color: #666; font-size: 14px; margin-top: 5px; }
+
+        #status { text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 14px; padding: 8px; border-radius: 6px; }
+        
+        .input-section { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 600px) { .input-section { grid-template-columns: 1fr 1fr; } }
+        
+        label { font-weight: 600; font-size: 13px; color: #34495e; }
+        input, select, textarea { 
+            width: 100%; padding: 11px; margin-top: 5px; border: 1px solid var(--border-color); 
+            border-radius: 8px; box-sizing: border-box; outline: none; background: #f8f9fa; transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #1e3c72; background: #fff; box-shadow: 0 0 0 3px rgba(30,60,114,0.1); }
+        
         .notice-banner {
             background-color: #fef2f2;
             border-left: 4px solid #ef4444;
@@ -46,298 +73,319 @@
             font-weight: 600;
         }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 18px; display: flex; flex-direction: column; }
-        
-        label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #4b5563; text-transform: uppercase; }
-        
-        input, select, textarea { 
-            width: 100%; padding: 11px 14px; border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 14px; transition: all 0.3s; background: #f9fafb; outline: none;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-        input[readonly] { background-color: #e5e7eb; cursor: not-allowed; }
-
-        .conditional-group { display: none; background: #f0fdf4; padding: 15px; border-radius: 10px; border-left: 4px solid #22c55e; margin-bottom: 18px; }
-        .photo-conditional { display: none; }
-
-        .file-input-wrapper { position: relative; border: 2px dashed var(--border); padding: 12px; border-radius: 8px; text-align: center; background: #f9fafb; cursor: pointer; }
-        .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-wrapper { border: 2px dashed var(--border-color); padding: 12px; border-radius: 8px; text-align: center; background: #f8f9fa; position: relative; cursor: pointer; }
+        .file-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
         .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; font-weight: 600; margin: 20px 0; color: #ef4444; }
         .checkbox-label input { width: 20px; height: 20px; accent-color: #ef4444; }
 
-        .submit-btn { 
-            background: var(--primary); color: white; border: none; padding: 14px; 
-            font-size: 16px; font-weight: 600; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.3s; 
+        button { 
+            grid-column: 1 / -1; 
+            background: var(--btn-gradient); 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: bold;
+            border-radius: 8px; 
+            margin-top: 15px; 
+            box-shadow: 0 4px 15px rgba(56,239,125,0.3);
+            transition: transform 0.2s;
         }
-        .submit-btn:hover { background: var(--primary-hover); }
-
-        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        button:active { transform: scale(0.98); }
+        
+        /* स्लिप डिझाईन (PNG स्वरूपात सेव्ह होणारा भाग) */
+        #notice-output { display: none; padding: 25px; line-height: 1.6; font-size: 16px; color: black; background: #fff; border: 2px solid #000; border-radius: 4px; }
+        .letter-header { text-align: center; font-weight: bold; text-decoration: underline; font-size: 20px; margin-bottom: 20px; margin-top: 10px; }
+        .sign-area { margin-top: 50px; display: flex; justify-content: space-between; font-weight: bold; }
+        .note-section { margin-top: 30px; border-top: 1px dashed #000; padding-top: 10px; font-size: 13px; font-style: italic; color: #333; }
     </style>
 </head>
-<body>
+<body onload="initSheet()">
 
-<div class="form-container">
-    <div class="pass-card" id="printablePass">
-        <!-- Logo Section (येथे तुमच्या लोगोची लिंक टाका) -->
-        <div class="logo-container">
-            <img src="https://via.placeholder.com/120x60?text=Sumeet+Logo" alt="Sumeet Logo" id="companyLogo">
+<div class="container">
+    <!-- इनपुट फॉर्म -->
+    <div id="input-form-wrapper">
+        <div class="header-box">
+            <div class="logo-box">
+                <img src="logo.png" alt="Sumeet Logo" onerror="this.src='https://via.placeholder.com/130x60?text=Sumeet+Logo'">
+            </div>
+            <h1>सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h1>
+            <p>Sumeet Early Exit Request</p>
         </div>
 
-        <div class="form-header">
-            <h2>Sumeet Early Exit Request</h2>
-            <p>रजा व लवकर जाण्याचा मंजुरी अर्ज</p>
-        </div>
+        <div id="status" style="background: #e1f5fe; color: #0288d1;">डेटा कनेक्ट होत आहे, कृपया थांबा...</div>
 
         <!-- महत्त्वाची सूचना -->
         <div class="notice-banner">
             ⚠️ टीप: रजेसाठी (Full Leave) युनिट Officer ची स्वाक्षरी (Signature) असणे बंधनकारक आहे.
         </div>
 
-        <form id="gatePassForm">
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>कर्मचारी क्रमांक / Employee ID *</label>
-                    <input type="text" id="employeeId" name="employeeId" required placeholder="उदा. EMP101" oninput="fetchEmployeeDetails()">
+        <form id="mainNoticeForm">
+            <div class="input-section">
+                <div>
+                    <label>EMP CODE (तिकीट नंबर):</label>
+                    <input type="text" id="emp-id" required placeholder="ID टाका..." oninput="findEmployee()">
                 </div>
-                <div class="form-group">
-                    <label>मोबाईल नंबर / Mobile Number</label>
-                    <input type="text" id="mobileNumber" name="mobileNumber" readonly placeholder="ऑटोमॅटिक येईल">
+                <div>
+                    <label>पूर्ण नाव:</label>
+                    <input type="text" id="emp-name" readonly style="background: #e9ecef; font-weight:bold;">
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>कामगाराचे पूर्ण नाव / Employee Full Name</label>
-                <input type="text" id="employeeName" name="employeeName" readonly placeholder="ऑटोमॅटिक येईल">
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Ward / विभाग</label>
-                    <input type="text" id="ward" name="ward" placeholder="उदा. Ward A">
+                <div>
+                    <label>पद (Designation):</label>
+                    <input type="text" id="emp-desig" readonly style="background: #e9ecef;">
                 </div>
-                <div class="form-group">
-                    <label>Unit / युनिट</label>
-                    <input type="text" id="unit" name="unit" placeholder="उदा. Unit 1">
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group">
+                <div>
                     <label>Shift / शिफ्ट *</label>
-                    <select id="shift" name="shift" required>
-                        <option value="">-- शिफ्ट निवडा --</option>
+                    <select id="shift-val" required>
                         <option value="Shift A">Shift A</option>
                         <option value="Shift B">Shift B</option>
                         <option value="Shift C">Shift C</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>अर्ज प्रकार / Request Type *</label>
-                    <select id="requestType" name="requestType" required onchange="toggleLeaveFields()">
-                        <option value="">-- अर्ज प्रकार निवडा --</option>
-                        <option value="Half Day">Half Day (अर्धा दिवस)</option>
-                        <option value="Full Leave">Full Leave (मोठी रजा)</option>
-                        <option value="Gate Pass">Early Exit (बाहेर जाणे)</option>
-                    </select>
+                <div>
+                    <label>तारीख / Date:</label>
+                    <input type="date" id="event-date" required>
                 </div>
+                <div>
+                    <label>घरी जाण्याची वेळ / Out Time:</label>
+                    <input type="time" id="out-time" required>
+                </div>
+
+                <!-- फोटो अपलोड ऑप्शन्स -->
+                <div>
+                    <label>WORKER HALF DAY PHOTO *</label>
+                    <div class="file-wrapper">
+                        <span id="lbl-p1">📷 कामगाराचा फोटो घ्या</span>
+                        <input type="file" id="worker-photo" accept="image/*" capture="environment" required onchange="updateFileLabel(this, 'lbl-p1')">
+                    </div>
+                </div>
+                <div>
+                    <label>APPLICATION PHOTO (अर्ज फोटो) *</label>
+                    <div class="file-wrapper">
+                        <span id="lbl-p2">📄 अर्जाचा फोटो घ्या</span>
+                        <input type="file" id="app-photo" accept="image/*" required onchange="updateFileLabel(this, 'lbl-p2')">
+                    </div>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label>Supervisor / Incharge Name:</label>
+                    <input type="text" id="supervisor-name" placeholder="सुपरवायझरचे नाव लिहा...">
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label>कारण / Reason for Early Exit:</label>
+                    <textarea id="manual-reason" rows="2" placeholder="येथे बाहेर जाण्याचे किंवा रजेचे कारण लिहा..." required></textarea>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="confirmation" required>
+                        पुष्टी / Confirmation (माहिती बरोबर आहे) *
+                    </label>
+                </div>
+
+                <button type="submit">अर्ज सबमिट करा व स्लिप डाउनलोड करा</button>
             </div>
-
-            <!-- 1. HALF DAY / EARLY EXIT OPTIONS -->
-            <div id="halfDayFields" class="conditional-group">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>तारीख / Date</label>
-                        <input type="date" id="hdDate" name="hdDate">
-                    </div>
-                    <div class="form-group">
-                        <label>घरी जाण्याची वेळ / Out Time</label>
-                        <input type="time" id="hdOutTime" name="hdOutTime">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. FULL LEAVE OPTIONS -->
-            <div id="fullLeaveFields" class="conditional-group">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>जाण्याची तारीख / Exit Date</label>
-                        <input type="date" id="flExitDate" name="flExitDate">
-                    </div>
-                    <div class="form-group">
-                        <label>परत येण्याची तारीख / Return Date</label>
-                        <input type="date" id="flReturnDate" name="flReturnDate">
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Supervisor / Incharge Name</label>
-                    <input type="text" id="supervisorName" name="supervisorName" placeholder="सुपरवायझरचे नाव">
-                </div>
-                <div class="form-group">
-                    <label>कारण / Reason for Leave</label>
-                    <textarea id="reason" name="reason" rows="1" placeholder="कारण लिहा..."></textarea>
-                </div>
-            </div>
-
-            <!-- DYNAMIC PHOTO SECTION -->
-            <div>
-                <!-- Half Day चे दोन फोटो ऑप्शन्स -->
-                <div id="halfDayPhotoGroup" class="grid-2 photo-conditional">
-                    <div class="form-group">
-                        <label>WORKER HALF DAY PHOTO *</label>
-                        <div class="file-input-wrapper">
-                            <span>📷 कामगाराचा फोटो घ्या</span>
-                            <input type="file" id="workerPhoto" accept="image/*" capture="environment">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>APPLICATION PHOTO *</label>
-                        <div class="file-input-wrapper">
-                            <span>📄 अर्जाचा फोटो घ्या</span>
-                            <input type="file" id="halfDayAppPhoto" accept="image/*">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Full Leave चा फोटो ऑप्शन -->
-                <div id="leaveAppPhotoGroup" class="form-group photo-conditional">
-                    <label>LEAVE APPLICATION PHOTO (Signसह अर्जाचा फोटो) *</label>
-                    <div class="file-input-wrapper" style="border-color: #ef4444;">
-                        <span>📄 रजा अर्जाचा फोटो अपलोड करा (स्वाक्षरीसह)</span>
-                        <input type="file" id="documentUpload" accept="image/*">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Compulsory Confirmation Checkbox -->
-            <label class="checkbox-label">
-                <input type="checkbox" id="confirmation" required>
-                पुष्टी / Confirmation (माहिती बरोबर आहे) *
-            </label>
-
-            <button type="submit" class="submit-btn">अर्ज सबमिट करा आणि PNG डाउनलोड करा</button>
         </form>
+    </div>
+
+    <!-- स्लिप आउटपुट (हा भाग PNG स्वरूपात डाउनलोड व शीटवर सेव्ह होईल) -->
+    <div id="notice-output">
+        <center>
+            <img src="logo.png" style="max-width:100px; display:block; margin-bottom:5px;" onerror="this.style.display='none'">
+            <h2 style="margin: 0; font-size:20px;">सुमित एल्कोप्लास्ट कल्याण एम एस डब्लू प्रा. लि.</h2>
+        </center>
+        <hr style="margin:10px 0; border:1px solid #000;">
+        <div class="letter-header">Early Exit Request Slip</div>
+        <div style="float: right;">दिनांक: <span id="pr-date"></span></div><br>
+        <strong>प्रती :</strong> <span id="pr-name"></span><br>
+        <strong>हुद्दा :</strong> <span id="pr-desig"></span><br>
+        <strong>तिकीट नंबर (EMP CODE) :</strong> <span id="pr-id"></span><br>
+        <strong>शिफ्ट / Shift :</strong> <span id="pr-shift"></span><br>
+        <strong>बाहेर जाण्याची वेळ / Out Time :</strong> <span id="pr-time"></span><br>
+        
+        <p style="margin-top:15px;">
+            <strong>निर्गमन कारण (Reason):</strong> <br>
+            <span id="pr-manual" style="padding-left: 15px; font-weight: bold; display:block; color:#2c3e50;"></span>
+        </p>
+        
+        <div style="margin-top:20px;">
+            <strong>Supervisor / Incharge:</strong> <span id="pr-supervisor"></span>
+        </div>
+
+        <div class="sign-area">
+            <span>यूनिट ऑफिसर</span>
+            <span>मानव संसाधन (HR)</span>
+        </div>
+        <div class="note-section">
+            <strong>नोट :</strong> सदर मंजुरी अर्ज स्लिप व्हॉटसअॅपवर पाठवावी आणि कामावर हजर झाल्यावर सही घेऊन HR कडे जमा करावी.
+        </div>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // ⚙️ १. गुगल वेब ॲप लिंक (WEB APP LINK OPTION)
-    // ==========================================
-    // तुमची Deploy केलेली गुगल स्क्रिप्ट URL खालील अवतरण चिन्हात (" ") पेस्ट करा:
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxYZLVJISYLMof1RQeGdYzjKp1wRP9ebcWSF1wKQ1N2SQVon-winpnv_7suECNfcpefxw/exec";
+    // 🛑 येथे तुमची Apps Script Web App URL टाका 🛑
+    const WEB_APP_URL = "https://script.google.com/macros/s/XXXXXX/exec"; 
 
-    // ==========================================
-    // 📊 २. CSV डेटा ऑप्शन (https://docs.google.com/spreadsheets/d/e/2PACX-1vSeyEu_N_mJ9UStKc6sXa2jdpMOr6QxviTldIucayGD1fg-ShCDDCdlKcOFcmKPtBt8LJpcWRLLnsSF/pub?output=csv)
-    // ==========================================
-    // तुमची CSV फाईल खालील फॉरमॅटमध्ये एकाखाली एक पेस्ट करून ठेवा:
-    const employeeDatabase = {
-        "EMP101": { name: "आनंदा सुमीत पाटील", mobile: "9876543210" },
-        "EMP102": { name: "सतीश विठ्ठल शिंदे", mobile: "9123456789" },
-        "EMP103": { name: "रमेश कुमार", mobile: "8888899999" }
-        // नवीन कर्मचाऱ्यांचा डेटा खाली याच पद्धतीने वाढवा...
-    };
+    // तुमची गुगल शीटची प्रकटीकरण (Published) CSV लिंक
+    const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSeyEu_N_mJ9UStKc6sXa2jdpMOr6QxviTldIucayGD1fg-ShCDDCdlKcOFcmKPtBt8LJpcWRLLnsSF/pub?output=csv"; 
 
-    // डीफॉल्ट तारखा सेट करणे
-    document.getElementById('hdDate').value = new Date().toISOString().substring(0, 10);
-    document.getElementById('flExitDate').value = new Date().toISOString().substring(0, 10);
+    let masterData = [];
+    
+    // आजची डीफॉल्ट तारीख सेट करणे
+    document.getElementById('event-date').value = new Date().toISOString().substring(0, 10);
 
-    // ऑटो-फील लॉजिक
-    function fetchEmployeeDetails() {
-        const empId = document.getElementById('employeeId').value.trim().toUpperCase();
-        const nameInput = document.getElementById('employeeName');
-        const mobileInput = document.getElementById('mobileNumber');
+    function initSheet() {
+        Papa.parse(sheetCSV, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                masterData = results.data;
+                const status = document.getElementById('status');
+                status.innerText = "डेटा यशस्वीरित्या कनेक्ट झाला! ✅";
+                status.style.background = "#e6f4ea";
+                status.style.color = "#137333";
+            },
+            error: function() {
+                const status = document.getElementById('status');
+                status.innerText = "डेटा कनेक्ट झाला नाही. CSV लिंक किंवा इंटरनेट तपासा.";
+                status.style.background = "#fce8e6";
+                status.style.color = "#c5221f";
+            }
+        });
+    }
 
-        if (employeeDatabase[empId]) {
-            nameInput.value = employeeDatabase[empId].name;
-            mobileInput.value = employeeDatabase[empId].mobile;
+    // आयडी फेच करण्यासाठीचे मूळ परफेक्ट वर्किंग लॉजिक
+    function findEmployee() {
+        const id = document.getElementById('emp-id').value.trim().toUpperCase();
+        if(!id) { resetFields(); return; }
+
+        const emp = masterData.find(row => {
+            const rowId = (row['EMP CODE'] || row['emp code'] || row['Emp Code'] || "").toString().trim().toUpperCase();
+            return rowId === id;
+        });
+
+        if(emp) {
+            document.getElementById('emp-name').value = emp['FULL NAME'] || emp['full name'] || emp['Full Name'] || "";
+            document.getElementById('emp-desig').value = emp['DESIGNATION'] || emp['designation'] || emp['Designation'] || "";
         } else {
-            nameInput.value = "";
-            mobileInput.value = "";
+            document.getElementById('emp-name').value = "शोधत आहे/सापडला नाही...";
+            document.getElementById('emp-desig').value = "";
         }
     }
 
-    // डायनॅमिक फिल्ड्स आणि फोटो लॉजिक बदल
-    function toggleLeaveFields() {
-        const requestType = document.getElementById('requestType').value;
-        
-        const halfDayBox = document.getElementById('halfDayFields');
-        const fullLeaveBox = document.getElementById('fullLeaveFields');
-        
-        const halfDayPhotoGroup = document.getElementById('halfDayPhotoGroup');
-        const leaveAppPhotoGroup = document.getElementById('leaveAppPhotoGroup');
-        
-        const workerPhotoInput = document.getElementById('workerPhoto');
-        const halfDayAppPhotoInput = document.getElementById('halfDayAppPhoto');
-        const documentUploadInput = document.getElementById('documentUpload');
+    function resetFields() {
+        document.getElementById('emp-name').value = "";
+        document.getElementById('emp-desig').value = "";
+    }
 
-        halfDayBox.style.display = 'none';
-        fullLeaveBox.style.display = 'none';
-        halfDayPhotoGroup.style.display = 'none';
-        leaveAppPhotoGroup.style.display = 'none';
-        
-        workerPhotoInput.required = false;
-        halfDayAppPhotoInput.required = false;
-        documentUploadInput.required = false;
-
-        if (requestType === 'Half Day' || requestType === 'Gate Pass') {
-            halfDayBox.style.display = 'block';
-            halfDayPhotoGroup.style.display = 'grid';
-            workerPhotoInput.required = true;
-            halfDayAppPhotoInput.required = true;
-        } else if (requestType === 'Full Leave') {
-            fullLeaveBox.style.display = 'block';
-            leaveAppPhotoGroup.style.display = 'block';
-            documentUploadInput.required = true;
+    function updateFileLabel(input, labelId) {
+        if(input.files.length > 0) {
+            document.getElementById(labelId).innerText = "✅ " + input.files[0].name.substring(0, 15) + "...";
+            document.getElementById(labelId).style.color = "green";
         }
     }
 
-    // फॉर्म सबमिशन, Google Sheet सेंडिंग, PNG डाउनलोड आणि ऑटो रिफ्रेश
-    document.getElementById('gatePassForm').addEventListener('submit', function(e) {
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            if (!file) resolve("");
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // फॉर्म सबमिट + PNG डाउनलोड + Google Sheet अपलोड प्रक्रिया
+    document.getElementById('mainNoticeForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        if(!document.getElementById('confirmation').checked) {
-            alert('कृपया पुष्टीकरणावर टिक करा!');
-            return;
+        const name = document.getElementById('emp-name').value;
+        if(!name || name.includes("सापडला नाही")) { 
+            alert("कृपया वैध तिकीट नंबर (EMP CODE) टाका."); 
+            return; 
         }
 
-        const submitBtn = document.querySelector('.submit-btn');
-        submitBtn.style.display = 'none'; // पीएनजी जनरेट करताना बटण लपवा
-
-        // गुगल शीटला डेटा पाठवण्यासाठी FormData तयार करणे
-        const formData = new FormData(this);
-
-        // Google Apps Script कडे बॅकग्राउंडमध्ये डेटा सेंड करणे
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.text())
-        .then(data => console.log("Google Sheet Response:", data))
-        .catch(err => console.error("Error sending to Sheet:", err));
-
-        // पीएनजी जनरेट करून डाउनलोड करणे
-        const passArea = document.getElementById('printablePass');
+        // स्लिपमध्ये डेटा भरणे
+        document.getElementById('pr-date').innerText = document.getElementById('event-date').value;
+        document.getElementById('pr-name').innerText = name;
+        document.getElementById('pr-desig').innerText = document.getElementById('emp-desig').value;
+        document.getElementById('pr-id').innerText = document.getElementById('emp-id').value;
+        document.getElementById('pr-shift').innerText = document.getElementById('shift-val').value;
+        document.getElementById('pr-time').innerText = document.getElementById('out-time').value;
+        document.getElementById('pr-supervisor').innerText = document.getElementById('supervisor-name').value;
         
-        html2canvas(passArea, { useCORS: true, scale: 2 }).then(canvas => {
+        const man = document.getElementById('manual-reason').value.trim();
+        document.getElementById('pr-manual').innerText = man;
+
+        // --- पीएनजी स्लिप जनरेशन ---
+        const inputForm = document.getElementById('input-form-wrapper');
+        const outputSlip = document.getElementById('notice-output');
+
+        inputForm.style.display = 'none'; 
+        outputSlip.style.display = 'block'; 
+
+        html2canvas(outputSlip, { useCORS: true, allowTaint: true, scale: 2 }).then(async (canvas) => {
+            const slipBase64Data = canvas.toDataURL('image/png');
+            
+            // स्लिप ऑटो-डाउनलोड
             const link = document.createElement('a');
-            link.download = `Sumeet_LeaveRequest_${document.getElementById('employeeId').value || 'Report'}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.download = `Sumeet_EarlyExit_${document.getElementById('emp-id').value}.png`;
+            link.href = slipBase64Data;
             link.click();
 
-            submitBtn.style.display = 'block'; // बटण परत दाखवा
-            alert('अर्ज सबमिट झाला आणि पीएनजी रिपोर्ट गॅलरीत डाउनलोड झाला आहे!');
-            
-            // फॉर्म ऑटो रिफ्रेश (Auto Reset) करणे
-            document.getElementById('gatePassForm').reset();
-            toggleLeaveFields();
+            // इमेजेस बेस६४ मध्ये कन्व्हर्ट करणे (गुगल शीटसाठी)
+            const file1 = document.getElementById('worker-photo').files[0];
+            const file2 = document.getElementById('app-photo').files[0];
+
+            const workerImgBase64 = await getBase64(file1);
+            const appImgBase64 = await getBase64(file2);
+            const slipImgBase64 = slipBase64Data.split(',')[1];
+
+            // पेलोड ऑब्जेक्ट तयार करणे
+            const payload = {
+                employeeId: document.getElementById('emp-id').value,
+                employeeName: name,
+                designation: document.getElementById('emp-desig').value,
+                shift: document.getElementById('shift-val').value,
+                eventDate: document.getElementById('event-date').value,
+                outTime: document.getElementById('out-time').value,
+                supervisor: document.getElementById('supervisor-name').value,
+                reason: man,
+                workerPhoto: workerImgBase64,
+                appPhoto: appImgBase64,
+                slipPhoto: slipImgBase64
+            };
+
+            document.getElementById('status').innerText = "डेटा व ३ फोटो गुगल शीटवर सेव्ह होत आहेत...";
+            document.getElementById('status').style.background = "#fff3cd";
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(resData => {
+                alert('अर्ज यशस्वीरित्या सेव्ह व स्लिप डाउनलोड झाली आहे!');
+                // फॉर्म ऑटो रिफ्रेश करणे
+                document.getElementById('mainNoticeForm').reset();
+                document.getElementById('lbl-p1').innerText = "📷 कामगाराचा फोटो घ्या";
+                document.getElementById('lbl-p2').innerText = "📄 अर्जाचा फोटो घ्या";
+                inputForm.style.display = 'block';
+                outputSlip.style.display = 'none';
+                initSheet();
+            })
+            .catch(err => {
+                console.error(err);
+                alert('डेटा अपलोड करताना एरर आला, पण स्लिप डाउनलोड झाली आहे.');
+                inputForm.style.display = 'block';
+                outputSlip.style.display = 'none';
+            });
         });
     });
 </script>
-
 </body>
 </html>
